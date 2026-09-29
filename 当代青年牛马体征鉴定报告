@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>当代青年牛马体征鉴定报告</title>
+  <meta name="description" content="测测你在格子间到底属于顶级和牛、自费现金牛还是弃疗死马？">
+  
+  <!-- Open Graph 社交抓取协议 -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="2026 当代青年牛马体征鉴定报告">
+  <meta property="og:description" content="测测你在格子间到底属于哪种职场物种。">
+  <meta property="og:image" content="https://api.dicebear.com/7.x/bottts/png?seed=niuma">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- html2canvas 截图库 -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex items-center justify-center font-sans antialiased selection:bg-lime-400 selection:text-black p-2 sm:p-4">
+
+  <!-- 微信爬虫抓取专用兜底图 (300x300, 隐藏在最顶端) -->
+  <div style="display:none; width:0; height:0; overflow:hidden;">
+    <img src="https://api.dicebear.com/7.x/bottts/png?seed=niuma" width="300" height="300" alt="牛马鉴定" />
+  </div>
+
+  <!-- 移动端外层主容器 (锁定 390px 黄金截图比例) -->
+  <div class="w-full max-w-[390px] min-h-[680px] bg-zinc-900 border border-zinc-800 rounded-[32px] shadow-2xl relative overflow-hidden flex flex-col justify-between p-5">
+    
+    <!-- 装饰背景光斑 -->
+    <div class="absolute -top-20 -right-20 w-44 h-44 bg-lime-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-20 -left-20 w-44 h-44 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- 顶栏状态 -->
+    <header class="flex items-center justify-between border-b border-zinc-800/80 pb-3 z-10">
+      <div class="flex items-center space-x-2">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-lime-400 animate-pulse"></span>
+        <span class="text-[11px] font-mono tracking-widest text-zinc-400 uppercase">SBTI-LAB 2026</span>
+      </div>
+      <div id="top-indicator" class="text-[11px] font-mono text-zinc-400 bg-zinc-800/60 px-2 py-0.5 rounded-full border border-zinc-700/40">
+        READY
+      </div>
+    </header>
+
+    <!-- ================= 屏幕 1：欢迎首页 ================= -->
+    <main id="screen-intro" class="flex-1 flex flex-col justify-center items-center text-center my-6 z-10">
+      <div class="inline-block px-3 py-1 rounded-full bg-lime-400/10 text-lime-400 text-[11px] font-mono border border-lime-400/20 mb-3">
+        // 职场人格反向透析
+      </div>
+      <h1 class="text-3xl font-black text-white tracking-tight leading-tight">
+        2026 当代青年<br/><span class="text-lime-400">牛马体征</span>鉴定报告
+      </h1>
+      <p class="text-xs text-zinc-400 mt-3 px-4 leading-relaxed">
+        摒弃虚伪的职业规划，解构真实的工位人格。<br>10 道硬核场景题，测出你在格子间的真实物种。
+      </p>
+
+      <div class="w-full mt-8 space-y-3">
+        <input id="user-nickname" type="text" maxlength="8" placeholder="输入工位代号 (默认: 阿强)" 
+               class="w-full bg-zinc-950/80 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-center text-white placeholder-zinc-500 focus:outline-none focus:border-lime-400 transition" />
+        <button id="btn-start" class="w-full bg-lime-400 hover:bg-lime-300 text-zinc-950 font-bold py-3.5 rounded-xl transition duration-200 transform active:scale-95 shadow-lg shadow-lime-400/10 text-xs">
+          开始全面体检 →
+        </button>
+      </div>
+    </main>
+
+    <!-- ================= 屏幕 2：答题页面 ================= -->
+    <main id="screen-quiz" class="flex-1 flex-col justify-between my-4 hidden z-10">
+      <div>
+        <div class="flex justify-between items-center text-xs font-mono text-zinc-400 mb-1.5">
+          <span>PROGRESS</span>
+          <span id="quiz-progress-text" class="text-lime-400">01 / 10</span>
+        </div>
+        <div class="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+          <div id="quiz-progress-bar" class="bg-lime-400 h-full w-[10%] transition-all duration-300"></div>
+        </div>
+      </div>
+
+      <div class="my-auto py-3">
+        <span id="quiz-tag" class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block mb-1">SCENARIO</span>
+        <h2 id="quiz-question-title" class="text-sm font-bold text-zinc-100 leading-snug">
+          题目加载中...
+        </h2>
+        
+        <div id="quiz-options" class="mt-4 space-y-2">
+          <!-- 动态注入选项 -->
+        </div>
+      </div>
+
+      <div class="text-[10px] text-zinc-500 text-center font-mono">
+        单选点击直接跳下一题
+      </div>
+    </main>
+
+    <!-- ================= 屏幕 3：结果页面与卡片 ================= -->
+    <main id="screen-result" class="flex-1 flex-col justify-between my-2 hidden z-10">
+      <!-- 截图区域 -->
+      <div id="capture-card" class="bg-zinc-950/90 border border-zinc-800 rounded-2xl p-4 shadow-inner relative overflow-hidden">
+        
+        <!-- 卡片顶栏 -->
+        <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2">
+          <span class="text-[9px] font-mono tracking-widest text-zinc-400 uppercase">OFFICIAL SBTI REPORT</span>
+          <span id="res-nickname" class="text-[10px] font-medium text-zinc-300 bg-zinc-800/80 px-2 py-0.5 rounded-full border border-zinc-700/50">
+            @阿强
+          </span>
+        </div>
+
+        <!-- 核心称号 -->
+        <div class="mt-2.5">
+          <div class="flex items-baseline justify-between">
+            <h2 id="res-code" class="text-4xl font-black tracking-tighter text-white font-mono leading-none">WRNM</h2>
+            <span id="res-subcode" class="text-[10px] font-semibold px-2 py-0.5 rounded bg-lime-400/10 text-lime-400 border border-lime-400/20">
+              精神暴走科
+            </span>
+          </div>
+          <div class="text-base font-bold text-zinc-100 mt-1 flex items-center gap-2">
+            <span id="res-name">沃日泥马</span>
+            <span id="res-rarity" class="text-[10px] text-zinc-500 font-normal">| 稀有度 8.7%</span>
+          </div>
+          <!-- 毒舌一句话 -->
+          <div id="res-quote" class="mt-2 p-2 bg-zinc-900 rounded-xl border-l-2 border-lime-400 text-[11px] text-zinc-300 leading-relaxed italic">
+            “表面微笑着回复‘收到’，心里已经在全员大会公屏上敲下了一万次‘沃日泥马’。”
+          </div>
+        </div>
+
+        <!-- 雷达图与五维数据 -->
+        <div class="mt-2.5 bg-zinc-900/60 rounded-xl p-2 border border-zinc-800/40 flex items-center justify-between">
+          <div class="w-24 h-24 relative flex-shrink-0">
+            <svg viewBox="0 0 200 200" class="w-full h-full overflow-visible">
+              <!-- 背景轴网 -->
+              <polygon points="100,20 176,75 147,165 53,165 24,75" fill="none" stroke="#3f3f46" stroke-width="1" />
+              <polygon points="100,50 146,83 128,139 72,139 54,83" fill="none" stroke="#27272a" stroke-width="1" />
+              <line x1="100" y1="100" x2="100" y2="20" stroke="#27272a" stroke-width="1" />
+              <line x1="100" y1="100" x2="176" y2="75" stroke="#27272a" stroke-width="1" />
+              <line x1="100" y1="100" x2="147" y2="165" stroke="#27272a" stroke-width="1" />
+              <line x1="100" y1="100" x2="53" y2="165" stroke="#27272a" stroke-width="1" />
+              <line x1="100" y1="100" x2="24" y2="75" stroke="#27272a" stroke-width="1" />
+              <!-- 动态多边形 -->
+              <polygon id="radar-polygon" points="100,30 160,80 130,150 70,150 40,80" 
+                       fill="rgba(163, 230, 53, 0.25)" stroke="#a3e635" stroke-width="2" />
+            </svg>
+          </div>
+          <!-- 右侧条形图 -->
+          <div id="stat-bars" class="flex-1 ml-3 space-y-1 text-[9px]">
+            <!-- 动态注入 -->
+          </div>
+        </div>
+
+        <!-- 物种特征 -->
+        <div class="mt-2.5">
+          <div class="text-[9px] font-mono text-zinc-500 uppercase tracking-wider mb-1">物种特征 // TRAITS</div>
+          <div id="res-traits" class="space-y-1 text-[10px] text-zinc-300">
+            <!-- 动态生成 3 条特征 -->
+          </div>
+        </div>
+
+        <!-- 职场搭子 -->
+        <div class="mt-2 grid grid-cols-2 gap-2 text-xs">
+          <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-zinc-800">
+            <div class="text-[9px] text-lime-400 font-bold">🤝 绝配搭子</div>
+            <div id="res-best-partner" class="font-bold text-zinc-200 text-[10px] mt-0.5">TROY 特洛伊木马</div>
+          </div>
+          <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-zinc-800">
+            <div class="text-[9px] text-red-400 font-bold">💥 命里克星</div>
+            <div id="res-worst-rival" class="font-bold text-zinc-200 text-[10px] mt-0.5">SPIN 抽打陀螺牛</div>
+          </div>
+        </div>
+
+        <!-- 生存指南 -->
+        <div class="mt-2 p-1.5 bg-zinc-900/40 rounded-lg border border-zinc-800 text-[9px] text-zinc-400 leading-tight">
+          <strong class="text-zinc-200">工位急救：</strong><span id="res-advice">离职信别放桌面防误触；每天默念三遍：杀人犯法，而且他们不配。</span>
+        </div>
+      </div>
+
+      <!-- 操作按钮区 -->
+      <div class="mt-3 space-y-2">
+        <button id="btn-save-img" class="w-full bg-lime-400 hover:bg-lime-300 text-zinc-950 font-bold py-2.5 rounded-xl transition text-xs shadow-md">
+          保存结果卡片（生成图片）
+        </button>
+        <button id="btn-restart" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 py-2 rounded-xl transition text-xs">
+          重新测一次
+        </button>
+      </div>
+    </main>
+
+    <!-- 底部标识 -->
+    <footer class="mt-2 pt-2 border-t border-zinc-800/80 text-[9px] font-mono text-zinc-600 text-center uppercase tracking-wider z-10">
+      WORKPLACE WILDLIFE LAB // ALL RIGHTS RESERVED
+    </footer>
+
+  </div>
+
+  <!-- 图片长按保存弹窗 -->
+  <div id="image-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-4 hidden">
+    <div class="max-w-[360px] w-full text-center">
+      <div class="text-xs text-lime-400 mb-2 font-mono">长按下方图片直接存储至相册</div>
+      <img id="generated-image" class="w-full rounded-2xl border border-zinc-700 shadow-2xl mb-4 max-h-[75vh] object-contain mx-auto" />
+      <button id="btn-close-modal" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs px-6 py-2 rounded-full border border-zinc-600">
+        关闭预览
+      </button>
+    </div>
+  </div>
+
+  <script>
+    /* ========================= 1. Web Audio 零依赖按键音效 ========================= */
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playTapSound(freq = 520, duration = 0.05) {
+      try {
+        if (!audioCtx) audioCtx = new AudioContextClass();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + duration);
+
+        gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    /* ========================= 2. 10 道精炼题库 ========================= */
+    const questions = [
+      {
+        title: "临下班前 5 分钟，领导群发：“晚上抓紧对个方案”",
+        options: [
+          { text: "假装没看见，扣下手机 5:59 准时开溜", scores: { S: 2, W: 1 } },
+          { text: "叹气回复“好的”，默默打开外卖软件点餐", scores: { O: 2, M: 2 } },
+          { text: "截屏发私聊小群，开始疯狂输出表情包", scores: { O: 1, W: 1 }, tag: "TROY" },
+          { text: "群里直球回复：“今晚有私人安排，周一聊”", scores: { S: 2, W: 2 }, tag: "WRNM" }
+        ]
+      },
+      {
+        title: "审视你眼前的工位桌面：",
+        options: [
+          { text: "人体工学椅、升降台全自费，装备拉满", scores: { G: 2, A: 1 }, tag: "CASH" },
+          { text: "只有破电脑和公司发的杯子，私人物品为零", scores: { T: 2, D: 1 } },
+          { text: "堆满陈年草稿纸和泛黄文件，像个坚守的阵地", scores: { O: 2, G: 1 }, tag: "TANK" },
+          { text: "桌面极简干净，随时做好“提包被裁走人”的准备", scores: { T: 2, W: 1 } }
+        ]
+      },
+      {
+        title: "任务下午两点就干完了，接下来四个小时你会：",
+        options: [
+          { text: "眉头紧锁猛敲键盘，假装很忙实则狂刷八卦", scores: { O: 1, T: 2 } },
+          { text: "开启带薪拉屎、茶水间巡逻漫游，全楼层布朗运动", scores: { S: 2, T: 2 } },
+          { text: "心里发慌，主动问领导：“还有活需要我支援吗？”", scores: { O: 2, G: 2 }, tag: "SPIN" },
+          { text: "打开副业文档或背单词，借公司水电为自己创收", scores: { S: 1, T: 2, A: 1 } }
+        ]
+      },
+      {
+        title: "跨部门复盘会被人当面暗戳戳甩锅：",
+        options: [
+          { text: "满脸通红、心跳加速，委屈得说不出话", scores: { M: 2, D: 1 } },
+          { text: "调出历史聊天记录和邮件，当场投屏念证据打脸", scores: { W: 2, T: 1 }, tag: "WRNM" },
+          { text: "息事宁人：“怪我没确认好”，只求快点散会", scores: { M: 2, G: 1 } },
+          { text: "顺水推舟：“你说得对，那后续全移交给你们吧”", scores: { W: 2, T: 2 } }
+        ]
+      },
+      {
+        title: "周日晚上 11 点，躺在床上你的生理状态通常是：",
+        options: [
+          { text: "脑子里全是明早的周会，胃部隐隐痉挛作痛", scores: { M: 2, D: 2 } },
+          { text: "还在回味周末的聚会户外，虽然累但精神很饱满", scores: { S: 1, A: 2 } },
+          { text: "报复性刷手机到凌晨两点：只要我不睡，周一就不来", scores: { W: 1, D: 1 } },
+          { text: "心如止水，像断电机器人准时昏睡，纯粹去上刑", scores: { O: 1, D: 2 } }
+        ]
+      },
+      {
+        title: "领导画大饼：“好好干，明年部门拆分由你挑大梁”",
+        options: [
+          { text: "表面点头微笑，内心毫无波澜甚至想笑", scores: { T: 1, W: 1 }, tag: "FROZ" },
+          { text: "浑身热血沸腾，立刻在笔记上写下三年奋斗计划", scores: { O: 2, G: 2 }, tag: "MINI" },
+          { text: "直白反问：“那这次涨薪幅度能落实到合同里吗？”", scores: { T: 2, W: 2 } },
+          { text: "借机诉苦：“先把今年被扣的绩效补齐再说”", scores: { S: 1, W: 1 } }
+        ]
+      },
+      {
+        title: "收到同事发来毫无上下文的两个字：“在吗？”",
+        options: [
+          { text: "假装没看见，等他发第二句具体事由再决定回不回", scores: { T: 1, W: 1 } },
+          { text: "秒回：“在的，怎么啦老师？”", scores: { O: 1, M: 2 } },
+          { text: "血压瞬间拉高，内心：“有事直接放，别问在不在”", scores: { W: 2, D: 1 }, tag: "WRNM" },
+          { text: "隔半天回个问号，或直接回复“不在”", scores: { S: 2, W: 1 } }
+        ]
+      },
+      {
+        title: "核心业务突发重大事故，全组手忙脚乱：",
+        options: [
+          { text: "绝望中独自一人把所有屎山代码/烂摊子全修好", scores: { O: 2, G: 2 }, tag: "TANK" },
+          { text: "默默缩在工位角落降低存在感，坚决不主动出头", scores: { S: 1, T: 2 } },
+          { text: "抢先在群里艾特所有人同步进展，实际上一行没改", scores: { S: 1, T: 1 } },
+          { text: "准点打卡下班：“这不属于我负责的模块”", scores: { S: 2, W: 2 } }
+        ]
+      },
+      {
+        title: "中午 12:00 到 14:00 的标准午休流程：",
+        options: [
+          { text: "边吃外卖边看工作群，吃完趴桌上睡 20 分钟继续干", scores: { O: 2, D: 2 } },
+          { text: "叫上同事去隔壁商场慢悠悠吃顿好的，顺便大聊八卦", scores: { S: 1, A: 2 } },
+          { text: "准时戴上眼罩降噪耳机，进入雷打不动的关机状态", scores: { O: 1, A: 1 } },
+          { text: "根本不吃饭，直奔健身房/外出散步，彻底远离工位", scores: { S: 2, A: 2 } }
+        ]
+      },
+      {
+        title: "听到小道消息称“下周部门可能要优化裁员”：",
+        options: [
+          { text: "焦虑失眠，生怕名单上有自己，开始疯狂主动加班", scores: { O: 2, M: 2 } },
+          { text: "暗自窃喜，甚至想问 HR 能不能主动申请 N+1 赔偿", scores: { S: 2, W: 2 }, tag: "DEAD" },
+          { text: "毫无感觉，反正到手这点薪水在哪都能混口饭吃", scores: { O: 1, T: 1 } },
+          { text: "连夜更新简历，并在各大平台标记为“正在求职”", scores: { S: 2, A: 1 }, tag: "RUNN" }
+        ]
+      }
+    ];
+
+    /* ========================= 3. 32 款牛马人格全量数据库 ========================= */
+    const archetypeDB = {
+      // 牛系 16 款
+      "WAGU": {
+        code: "WAGU", subcode: "特权度假科", name: "顶级和牛", rarity: "1.2%",
+        quote: "上班只是为了社保不断缴，本质是来工位带薪度假体验生活。",
+        stats: [10, 80, 5, 20, 98],
+        traits: ["工位整洁如样板间，常年手冲咖啡与高级香薰", "免死金牌体质，战火永远烧不到他头上", "开会只带耳朵和水杯，到点优雅离场"],
+        partner: "CASH 自费现金牛", rival: "SPIN 抽打陀螺牛", advice: "请继续保持这份优雅，你是办公室唯一的正常人。"
+      },
+      "CASH": {
+        code: "CASH", subcode: "慈善赞助科", name: "自费现金牛", rarity: "4.5%",
+        quote: "工位装备两万八，月薪到手三千八，纯自费倒贴上班。",
+        stats: [20, 60, 45, 75, 95],
+        traits: ["升降桌、人体工学椅、降噪耳机全套自费顶配", "通勤打车加精品特调，认真算账甚至在亏钱上班", "上班动力是给昂贵外设找个展示橱窗"],
+        partner: "WAGU 顶级和牛", rival: "DEAD 弃疗死马", advice: "少给工位买两件装备，辞职看世界的底气能提前半年。"
+      },
+      "TANK": {
+        code: "TANK", subcode: "基建承重科", name: "耕地老黄牛", rarity: "14.8%",
+        quote: "一个人撑起整个系统核心，升职加薪没你，线上救火第一。",
+        stats: [15, 30, 98, 99, 85],
+        traits: ["核心承重墙，请假一天部门直接报故障", "看着烂摊子没人管就会浑身难受，默默通宵擦屁股", "干着全组最累的活，拿中游水平的工资"],
+        partner: "FROZ 速冻冷鲜牛", rival: "EVIL 害群之马", advice: "试着偶尔‘假装修不好’，才能看清自己到底是神还是耗材。"
+      },
+      "RAGE": {
+        code: "RAGE", subcode: "掀桌整顿科", name: "狂躁斗牛", rarity: "3.8%",
+        quote: "劳动法倒背如流，眼神里写满了‘想死就再加个需求’。",
+        stats: [99, 10, 85, 60, 0],
+        traits: ["微表情管理报废，开麦怒怼甩锅同事与画饼领导", "抽屉常备法条打印件，离职赔偿谈判专家", "拒绝道德绑架，给多少钱干多少活"],
+        partner: "WRNM 沃日泥马", rival: "MINI 懵懂幼牛", advice: "血压常年在高危区，深呼吸，犯不上为这点窝囊废钱折寿。"
+      },
+      "YAKK": {
+        code: "YAKK", subcode: "极境耐受科", name: "高原牦牛", rarity: "9.2%",
+        quote: "在极度缺氧且有毒的管理环境里，居然还能靠惯性活着。",
+        stats: [5, 35, 92, 70, 95],
+        traits: ["无薪加班、领导发疯，他都能面无表情敲键盘", "只要工资准时打卡，屋顶漏水也能继续干", "对周围一切八卦争斗免疫，像一尊工位石雕"],
+        partner: "TANK 耕地老黄牛", rival: "WILD 精神野马", advice: "钝感能保命，但别在泥潭里泡太久，皮泡烂了真出不去了。"
+      },
+      "MILC": {
+        code: "MILC", subcode: "无偿榨汁科", name: "枯竭奶牛", rarity: "8.6%",
+        quote: "天天被各部门无偿榨汁，自己连一口新鲜草料都没见过。",
+        stats: [10, 20, 95, 88, 70],
+        traits: ["跨部门资源池，谁找他求助都从不说‘不’", "精力被杂事切碎，主线任务天天只能熬夜做", "产出丰盛却没人感激，被视为理所当然的基建"],
+        partner: "TANK 耕地老黄牛", rival: "CHSS 象棋走日马", advice: "学会说‘不在我的职责范围内’，能救你半条命。"
+      },
+      "SCOL": {
+        code: "SCOL", subcode: "防御拖延科", name: "工位蜗牛", rarity: "6.5%",
+        quote: "回复消息按天计算，信奉‘只要我不动，需求自己会死’。",
+        stats: [65, 40, 15, 20, 85],
+        traits: ["半小时能做完的活，靠精湛走位拉长到三天交付", "任何催办信息到他这里都要经历漫长的信号衰减", "用极低的反应速度熬死 80% 的临时突发需求"],
+        partner: "MUDD 潜水水牛", rival: "SPIN 抽打陀螺牛", advice: "拖延术虽好，但小心别卡在重要交付节点被祭旗。"
+      },
+      "MUDD": {
+        code: "MUDD", subcode: "潜行摸鱼科", name: "潜水水牛", rarity: "5.8%",
+        quote: "摸鱼界的隐形战机，头像永远在线，找他办事永远失联。",
+        stats: [75, 85, 10, 25, 90],
+        traits: ["企微状态常驻‘忙碌’，人可能在天台吹风或带薪洗头", "开小差从未被抓包，秒级窗口回一句‘刚在洗手间’", "把摸鱼融入生命节律，表面看着专注得像个学者"],
+        partner: "GHOZ 幽灵白马", rival: "POST 传话驿马", advice: "潜水技术一流，别忘了偶尔冒个泡证明自己还活着。"
+      },
+      "SLEP": {
+        code: "SLEP", subcode: "脑机离线科", name: "嗜睡肉牛", rarity: "7.1%",
+        quote: "下午两点准时脑死亡，键盘上的敲击全凭植物神经反射。",
+        stats: [30, 20, 50, 15, 80],
+        traits: ["吃完午饭碳水过载，两点到四点脑电波呈直线", "屏幕光标闪动，实际上眼睛半眯，大脑一片空白", "每天两杯大冰美式，心率 110，脑子依然睡得死沉"],
+        partner: "DEAD 弃疗死马", rival: "RACE 赛道卷马", advice: "中午少吃碳水，放瓶风油精，小心口水流到键盘上。"
+      },
+      "BONE": {
+        code: "BONE", subcode: "极限透支科", name: "剔骨牛架", rarity: "4.2%",
+        quote: "剩余价值已被榨得一滴不剩，唯一的悬念是哪批被裁。",
+        stats: [35, 10, 99, 40, 45],
+        traits: ["体检报告上的异常指标比年终奖项还丰富", "曾经也是部门卷王，如今只剩一副躯壳在敲代码", "对加薪毫无执念，满脑子只想拿赔偿躺平三个月"],
+        partner: "DEAD 弃疗死马", rival: "MINI 懵懂幼牛", advice: "赶紧去医院体检，命是自己的，公司下个月就招新人了。"
+      },
+      "MINI": {
+        code: "MINI", subcode: "纯真受骗科", name: "懵懂幼牛", rarity: "8.3%",
+        quote: "眼神清澈而愚蠢，甚至把老板画的大饼抄在笔记本上。",
+        stats: [5, 5, 65, 60, 60],
+        traits: ["遇到离谱制度先反思是不是自己不够努力", "领导开会讲的空话套话，认认真真记了三大页", "被领导敲打两句，躲在卫生间怀疑人生一整天"],
+        partner: "TANK 耕地老黄牛", rival: "RAGE 狂躁斗牛", advice: "收起你的笔记本，职场不是学校，领导不是导师。"
+      },
+      "ZOMB": {
+        code: "ZOMB", subcode: "植物神经科", name: "丧尸耕牛", rarity: "9.5%",
+        quote: "班味已入骨髓，就算心脏停止跳动，右手还能自动点保存。",
+        stats: [0, 10, 99, 85, 90],
+        traits: ["面如死灰黑眼圈深重，全靠机械肌肉记忆交付", "周末手机一震依然条件反射般浑身紧绷", "失去了喜怒哀乐，纯粹是一台永动机零件"],
+        partner: "TANK 耕地老黄牛", rival: "WILD 精神野马", advice: "周末关掉电脑去草地滚两圈，把肺里的班味咳出来。"
+      },
+      "FROZ": {
+        code: "FROZ", subcode: "低温休眠科", name: "速冻冷鲜牛", rarity: "11.0%",
+        quote: "职场情感彻底冻结，任凭老板画多大的饼，心率都稳定在 60 下。",
+        stats: [60, 50, 20, 65, 90],
+        traits: ["对激情演说生理性脱敏，面部神经开会时自动休克", "一手交钱一手交代码，不搞虚伪团建与情感投入", "极少情绪内耗，在工位像一块保质期极长的冻肉"],
+        partner: "TANK 耕地老黄牛", rival: "MINI 懵懂幼牛", advice: "冷鲜保存非常长寿，但下班后记得解冻，活出人情味。"
+      },
+      "SALT": {
+        code: "SALT", subcode: "防腐元老科", name: "风干老牛肉", rarity: "3.5%",
+        quote: "资历比工位旁的打印机还老，骂不走裁不动，新政到他这直接石沉大海。",
+        stats: [80, 50, 10, 30, 95],
+        traits: ["见证五任总监离任，深谙一切制度漏洞", "新领导烧的三把火，到他身上连根毫毛都烧不着", "不争名利但也绝不背锅，稳坐角落如泰山"],
+        partner: "DEAD 弃疗死马", rival: "SHOW 盛装舞步马", advice: "低调行事，别太倚老卖老，小心变成降本增效典型。"
+      },
+      "SPIN": {
+        code: "SPIN", subcode: "自虐永动机科", name: "抽打陀螺牛", rarity: "7.8%",
+        quote: "自虐型劳碌体质，不被领导催就浑身刺挠，周末不看消息甚至会产生负罪感。",
+        stats: [5, 20, 90, 85, 40],
+        traits: ["闲下来就会产生严重的冒充者综合征与恐慌感", "事情刚干完立刻去领导工位打转要新活", "周末自愿加班，群里@所有人同步进展拉高焦虑"],
+        partner: "MINI 懵懂幼牛", rival: "WRNM 沃日泥马", advice: "焦虑来源于空虚的自我，学会与无所事事和平共处。"
+      },
+      "BULL": {
+        code: "BULL", subcode: "借地操盘科", name: "华尔街狂牛", rarity: "4.0%",
+        quote: "上班只是为了蹭空调和有张桌子看大盘，月薪到手三千五，基金亏三万。",
+        stats: [85, 75, 60, 15, 30],
+        traits: ["主屏挂着公司虚假报表，副屏挂着分时走势图", "心率与股市同步，开盘到收盘情绪大起大落", "打工微薄的薪水全当成了补仓的过桥资金"],
+        partner: "GHOZ 幽灵白马", rival: "TANK 耕地老黄牛", advice: "安心干活吧，股市亏的钱，工位打十年螺丝都补不回。"
+      },
+
+      // 马系 16 款
+      "LOOP": {
+        code: "LOOP", subcode: "原地踏步科", name: "旋转木马", rarity: "6.8%",
+        quote: "日程排满八场对齐会，除了原地打转没有任何实质产出。",
+        stats: [30, 95, 70, 5, 70],
+        traits: ["日历拉通、闭环、复盘，一天开六个小时会", "周五写周报抓破头，发现整整一周啥成果没有", "擅长制造忙碌的舞台效果，掩盖业务停滞真相"],
+        partner: "SHOW 盛装舞步马", rival: "TANK 耕地老黄牛", advice: "少开两次毫无营养的拉通会，世界不会塌下来。"
+      },
+      "WILD": {
+        code: "WILD", subcode: "灵魂游离科", name: "精神野马", rarity: "12.5%",
+        quote: "肉体被公司钉在工位上发呆，灵魂早在川藏线上徒步了三天。",
+        stats: [75, 40, 30, 45, 60],
+        traits: ["眼神常年虚焦，全靠植物神经维持敲键盘", "下班瞬间眼里才有高光，周末永远在户外失联", "对领导宏图伟略无动于衷，只关心周末天气"],
+        partner: "DEAD 弃疗死马", rival: "SPIN 抽打陀螺牛", advice: "藏好浏览器里的旅游攻略，切屏手速千万别慢了。"
+      },
+      "ZEBR": {
+        code: "ZEBR", subcode: "人格裂变科", name: "双面斑马", rarity: "8.1%",
+        quote: "上班是黑白遗照毫无生机，下班瞬间无缝切换夜店霓虹灯。",
+        stats: [75, 90, 50, 50, 50],
+        traits: ["白天工位戴眼镜叹气，晚上 Livehouse 连蹦三小时", "同事完全不知道他业余生活有多野，判若两人", "走出闸机瞬间，电量从 1% 暴冲至 100%"],
+        partner: "WILD 精神野马", rival: "ZOMB 丧尸耕牛", advice: "注意面部防衰老，这种高频人格切换极度消耗神经。"
+      },
+      "DEAD": {
+        code: "DEAD", subcode: "超然弃疗科", name: "弃疗死马", rarity: "6.1%",
+        quote: "绩效拿 C 面带微笑，开门见山问 HR：‘N+1 什么时候到账？’",
+        stats: [90, 10, 10, 5, 95],
+        traits: ["不争升职不怕被辞，领导任何手段在他面前全部失效", "下班闹钟一响，哪怕火烧眉毛也能面不改色收包离席", "多写一行非必要文档都算亏损，坚决杜绝内卷"],
+        partner: "WILD 精神野马", rival: "TANK 耕地老黄牛", advice: "继续保持这种超低功耗，你的健康指标往往是全组最好的。"
+      },
+      "PONY": {
+        code: "PONY", subcode: "战术装傻科", name: "职场矮马", rarity: "7.4%",
+        quote: "腿短跑得慢，背锅第一线，全靠装傻充愣勉强续命。",
+        stats: [20, 70, 40, 30, 75],
+        traits: ["一有棘手需求立刻一脸迷茫：‘老师这个我不会呀’", "从不强出头，故意维持平庸水平，躲过无数大坑", "能力一般但人缘极佳，大家都不忍心对他下狠手"],
+        partner: "MINI 懵懂幼牛", rival: "RAGE 狂躁斗牛", advice: "装傻是门技术，别装久了真让自己大脑退化了。"
+      },
+      "MULE": {
+        code: "MULE", subcode: "杂役苦力科", name: "骡马大弟", rarity: "10.2%",
+        quote: "杂活累活全包揽，既生不出代表作，也永远轮不到晋升。",
+        stats: [10, 15, 92, 80, 65],
+        traits: ["贴发票、订会议室、整理报表，杂活全是他的", "忙死忙活一整年，年终汇报没有一项能写进主业绩", "既带不了新人，也孵化不出自己的独立业务"],
+        partner: "MILC 枯竭奶牛", rival: "SHOW 盛装舞步马", advice: "果断推掉边缘杂活，没有代表作，就永远没有议价权。"
+      },
+      "GHOZ": {
+        code: "GHOZ", subcode: "物理遁形科", name: "幽灵白马", rarity: "3.2%",
+        quote: "工位常年挂着外套，水杯常年冒热气，但本尊查无此人。",
+        stats: [80, 85, 5, 15, 90],
+        traits: ["椅背挂外套、屏幕常亮、鼠标放自动移动器伪装在场", "经常在楼下咖啡馆、天台甚至隔壁商场完成打卡", "全组都知道有这么个人，但谁也不知道他此刻在哪"],
+        partner: "MUDD 潜水水牛", rival: "POST 传话驿马", advice: "道具记得经常换洗，外套挂一个月不起皱容易穿帮。"
+      },
+      "RUNN": {
+        code: "RUNN", subcode: "跑路预备科", name: "惊弓之马", rarity: "6.9%",
+        quote: "抽屉里常备简历打印件，一有风吹草动立刻准备跑路。",
+        stats: [65, 50, 65, 45, 30],
+        traits: ["领导关门开会超半小时，就怀疑部门要被砍", "手头永远挂着两三个求职面试，工位只放随时能带走的私人物品", "总觉得公司明天就要倒闭，每天都在谋划退路"],
+        partner: "DEAD 弃疗死马", rival: "YAKK 高原牦牛", advice: "保持流动性是好事，但过度风声鹤唳会让你在哪都扎不下根。"
+      },
+      "FAKE": {
+        code: "FAKE", subcode: "包装诈骗科", name: "金光纸马", rarity: "3.1%",
+        quote: "简历光鲜吓退猎头，真实水平连表格求和都要现搜教程。",
+        stats: [40, 99, 30, 10, 40],
+        traits: ["张口闭口底层逻辑与闭环，实际落地全靠外包与下属", "头衔吓人，经手的项目全靠别人填坑，生怕现场被考问实操", "遇到懂行的技术专家立马借口开会尿遁逃跑"],
+        partner: "SHOW 盛装舞步马", rival: "TANK 耕地老黄牛", advice: "谎言终有被戳破的一天，抽空补补基础业务能力防身。"
+      },
+      "EVIL": {
+        code: "EVIL", subcode: "爆破内讧科", name: "害群之马", rarity: "2.5%",
+        quote: "甩锅速度突破光速，专业挑刺制造内讧的项目终结者。",
+        stats: [90, 80, 20, 10, 20],
+        traits: ["项目出问题，总能在聊天记录里抠出三个字把责任推给别人", "方案执行前提不出意见，交付后立刻指责全盘不合理", "有他在的项目，核心骨干离职率高达 80%"],
+        partner: "FAKE 金光纸马", rival: "TANK 耕地老黄牛", advice: "常在河边走哪有不湿鞋，名声臭了换行业都没人要你。"
+      },
+      "WRNM": {
+        code: "WRNM", subcode: "精神暴走科", name: "沃日泥马", rarity: "8.7%",
+        quote: "表面微笑着回复‘收到’，心里已经在全员大会公屏上敲下了一万次‘沃日泥马’。",
+        stats: [98, 92, 85, 35, 5],
+        traits: ["嘴在笑眼在杀人，能用最礼貌的语气说出最冰冷的‘好的’", "聊天框常备千字长篇输出，深呼吸三次后全删改回‘收到’", "讨厌无上下文的‘在吗’，任何无效会议都会扣减寿命"],
+        partner: "TROY 特洛伊木马", rival: "SPIN 抽打陀螺牛", advice: "离职信别放桌面防误触；每天默念三遍：杀人犯法，而且他们不配。"
+      },
+      "TROY": {
+        code: "TROY", subcode: "敌后情报科", name: "特洛伊木马", rarity: "4.8%",
+        quote: "表面是人畜无害的小透明，背地里是跨部门吐槽大群群主兼八卦总局局长。",
+        stats: [90, 95, 40, 40, 60],
+        traits: ["谁要离职、谁和领导撕逼，他比 HR 掌握得还要早三天", "手机里有八个没有领导的吃瓜小群，天天组织舆情狂欢", "在直属领导面前极其乖巧，甚至经常被评为‘老实本分’"],
+        partner: "WRNM 沃日泥马", rival: "POST 传话驿马", advice: "发私密吐槽群时千万看清窗口，发错大群当场就是职场死刑。"
+      },
+      "SHOW": {
+        code: "SHOW", subcode: "盛装汇报科", name: "盛装舞步马", rarity: "5.2%",
+        quote: "活干得极少但汇报极美，擅长把日常拧螺丝包装成‘工业动力学系统重构’。",
+        stats: [20, 98, 35, 15, 80],
+        traits: ["工作 10 分钟汇报排版 4 小时，动画特效堪比好莱坞大片", "领导的喜好摸得一清二楚，永远在领导能看见的时刻现身", "擅长把底层耗材的血汗成果提炼成自己的高维思考框架"],
+        partner: "FAKE 金光纸马", rival: "TANK 耕地老黄牛", advice: "汇报水平天下第一，但好歹留点活路给替你干活的老黄牛。"
+      },
+      "CHSS": {
+        code: "CHSS", subcode: "边界防御科", name: "象棋走日马", rarity: "6.7%",
+        quote: "边界感极强的防御大师，凡是不在岗位职责（JD）里的活，多动一根手指都算输。",
+        stats: [85, 60, 15, 50, 85],
+        traits: ["跨部门需求只要没走正规审批流，当场冷酷拒绝", "不越雷池半步，拒绝任何‘顺便帮我看一下’的人情杂活", "把岗位职责当圣经，休想对我搞职责模糊和职能拓展"],
+        partner: "FROZ 速冻冷鲜牛", rival: "MILC 枯竭奶牛", advice: "边界感是你的护城河，继续坚守，绝不能向糊涂账妥协。"
+      },
+      "PEGA": {
+        code: "PEGA", subcode: "虚空架构科", name: "赛博天马", rarity: "3.6%",
+        quote: "方案在 PPT 里飞出银河系，落到地面执行全靠同事的寿命填坑。",
+        stats: [50, 95, 30, 20, 70],
+        traits: ["空中楼阁设计师，构想宏大但唯独不考虑研发成本", "一顿指挥猛如虎，执行同事加班到吐血，方案依然跑不通", "经典语录：‘我的思路是领先的，是你们落地能力跟不上’"],
+        partner: "SHOW 盛装舞步马", rival: "TANK 耕地老黄牛", advice: "多落地看看真实的泥坑，别总在云端飘着，摔下来很惨。"
+      },
+      "POST": {
+        code: "POST", subcode: "二道搬运科", name: "传话驿马", rarity: "7.0%",
+        quote: "毫无个人思想的二道贩子，日常只会‘收到、拉群、@所有人 请同步一下’。",
+        stats: [15, 75, 25, 20, 80],
+        traits: ["上游一句话立刻新建三个群，原封不动艾特下家处理", "经由他转述的事情通常丢失 50% 关键信息，全靠双方私下对齐", "他不是解决问题的人，他是问题的广播喇叭"],
+        partner: "LOOP 旋转木马", rival: "CHSS 象棋走日马", advice: "当传话机器迟早被脚本替代，试着带着解决方案去沟通。"
+      }
+    };
+
+    /* ========================= 4. 答题与计分逻辑 ========================= */
+    let currentQuestionIndex = 0;
+    let scores = { O: 0, S: 0, G: 0, T: 0, M: 0, W: 0, A: 0, D: 0 };
+    let tagCounts = {};
+    let userNick = "阿强";
+
+    const screenIntro = document.getElementById("screen-intro");
+    const screenQuiz = document.getElementById("screen-quiz");
+    const screenResult = document.getElementById("screen-result");
+    const topIndicator = document.getElementById("top-indicator");
+
+    // 开始测试
+    document.getElementById("btn-start").addEventListener("click", () => {
+      playTapSound(600, 0.08);
+      const inputVal = document.getElementById("user-nickname").value.trim();
+      if (inputVal) userNick = inputVal;
+      
+      screenIntro.classList.add("hidden");
+      screenQuiz.classList.remove("hidden");
+      screenQuiz.classList.add("flex");
+      topIndicator.innerText = "TESTING";
+      
+      renderQuestion();
+    });
+
+    // 渲染题目
+    function renderQuestion() {
+      const q = questions[currentQuestionIndex];
+      const total = questions.length;
+      
+      document.getElementById("quiz-progress-text").innerText = 
+        `${String(currentQuestionIndex + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+      document.getElementById("quiz-progress-bar").style.width = 
+        `${((currentQuestionIndex + 1) / total) * 100}%`;
+      
+      document.getElementById("quiz-tag").innerText = `SCENARIO // 0${currentQuestionIndex + 1}`;
+      document.getElementById("quiz-question-title").innerText = q.title;
+
+      const optionsContainer = document.getElementById("quiz-options");
+      optionsContainer.innerHTML = "";
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "w-full text-left p-3 rounded-xl bg-zinc-950/70 border border-zinc-800/80 hover:border-lime-400 hover:bg-zinc-800/50 transition duration-150 flex items-start space-x-2.5 text-xs leading-relaxed group";
+        
+        const letter = String.fromCharCode(65 + idx);
+        btn.innerHTML = `
+          <span class="w-4 h-4 rounded bg-zinc-800 text-zinc-400 group-hover:bg-lime-400 group-hover:text-black flex items-center justify-center font-mono font-bold text-[9px] flex-shrink-0 transition">
+            ${letter}
+          </span>
+          <span class="text-zinc-300 group-hover:text-white flex-1">${opt.text}</span>
+        `;
+
+        btn.addEventListener("click", () => handleSelectOption(opt));
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    // 处理选项并计分
+    function handleSelectOption(option) {
+      playTapSound(480, 0.05);
+
+      for (const [key, val] of Object.entries(option.scores)) {
+        scores[key] = (scores[key] || 0) + val;
+      }
+      if (option.tag) {
+        tagCounts[option.tag] = (tagCounts[option.tag] || 0) + 1;
+      }
+
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        renderQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    // 测评完成计算结果
+    function finishQuiz() {
+      playTapSound(880, 0.15);
+      screenQuiz.classList.add("hidden");
+      screenResult.classList.remove("hidden");
+      screenResult.classList.add("flex");
+      topIndicator.innerText = "COMPLETED";
+
+      // 1. 优先检测极端特质彩蛋 (Flags)
+      let result = null;
+      if ((tagCounts["WRNM"] || 0) >= 2) result = archetypeDB["WRNM"];
+      else if ((tagCounts["CASH"] || 0) >= 1) result = archetypeDB["CASH"];
+      else if ((tagCounts["TANK"] || 0) >= 2) result = archetypeDB["TANK"];
+      else if ((tagCounts["DEAD"] || 0) >= 1) result = archetypeDB["DEAD"];
+      else if ((tagCounts["FROZ"] || 0) >= 1) result = archetypeDB["FROZ"];
+      else if ((tagCounts["TROY"] || 0) >= 1) result = archetypeDB["TROY"];
+      else if ((tagCounts["SPIN"] || 0) >= 1) result = archetypeDB["SPIN"];
+      else if ((tagCounts["RUNN"] || 0) >= 1) result = archetypeDB["RUNN"];
+      else if ((tagCounts["MINI"] || 0) >= 1) result = archetypeDB["MINI"];
+
+      // 2. 兜底映射：16 种 4 字母组合严格对应 16 种经典牛马
+      if (!result) {
+        const code = (scores.S >= scores.O ? 'S' : 'O') +
+                     (scores.T >= scores.G ? 'T' : 'G') +
+                     (scores.W >= scores.M ? 'W' : 'M') +
+                     (scores.A >= scores.D ? 'A' : 'D');
+
+        const codeMapping = {
+          "OGMA": "MINI", "OGMD": "TANK", "OGWA": "YAKK", "OGWD": "ZOMB",
+          "OTMA": "PONY", "OTMD": "SLEP", "OTWA": "SALT", "OTWD": "SCOL",
+          "SGMA": "LOOP", "SGMD": "MULE", "SGWA": "PEGA", "SGWD": "MILC",
+          "STMA": "SHOW", "STMD": "POST", "STWA": "WILD", "STWD": "CHSS"
+        };
+        result = archetypeDB[codeMapping[code] || "WILD"];
+      }
+
+      // 3. 填充卡片字段
+      document.getElementById("res-nickname").innerText = `@${userNick} 的鉴定报告`;
+      document.getElementById("res-code").innerText = result.code;
+      document.getElementById("res-subcode").innerText = result.subcode;
+      document.getElementById("res-name").innerText = result.name;
+      document.getElementById("res-rarity").innerText = `| 稀有度 ${result.rarity}`;
+      document.getElementById("res-quote").innerText = result.quote;
+      document.getElementById("res-best-partner").innerText = result.partner;
+      document.getElementById("res-worst-rival").innerText = result.rival;
+      document.getElementById("res-advice").innerText = result.advice;
+
+      // 渲染物种特征
+      const traitsContainer = document.getElementById("res-traits");
+      traitsContainer.innerHTML = "";
+      result.traits.forEach(t => {
+        const item = document.createElement("div");
+        item.className = "flex items-start gap-1 bg-zinc-900/60 p-1.5 rounded border border-zinc-800/60 leading-tight";
+        item.innerHTML = `<span class="text-lime-400">⚡</span><span>${t}</span>`;
+        traitsContainer.appendChild(item);
+      });
+
+      renderRadarAndStats(result.stats);
+    }
+
+    // 动态渲染雷达图
+    function renderRadarAndStats(stats) {
+      const statLabels = ["反骨储备", "演技水平", "精神损耗", "有效产出", "忍耐阈值"];
+      const barsContainer = document.getElementById("stat-bars");
+      barsContainer.innerHTML = "";
+
+      statLabels.forEach((label, i) => {
+        const val = stats[i] || 50;
+        const bar = document.createElement("div");
+        bar.innerHTML = `
+          <div class="flex justify-between text-zinc-400 mb-0.5">
+            <span>${label}</span><span class="font-mono text-lime-400">${val}%</span>
+          </div>
+          <div class="w-full bg-zinc-800 h-1 rounded-full overflow-hidden">
+            <div class="bg-lime-400 h-full transition-all duration-500" style="width: ${val}%"></div>
+          </div>
+        `;
+        barsContainer.appendChild(bar);
+      });
+
+      // 极坐标多边形动态计算
+      const centerX = 100, centerY = 100, maxR = 80;
+      const angles = [-Math.PI / 2, -Math.PI / 2 + (2 * Math.PI / 5), -Math.PI / 2 + (4 * Math.PI / 5), -Math.PI / 2 + (6 * Math.PI / 5), -Math.PI / 2 + (8 * Math.PI / 5)];
+      
+      const points = stats.map((val, i) => {
+        const r = maxR * (val / 100);
+        const x = Math.round(centerX + r * Math.cos(angles[i]));
+        const y = Math.round(centerY + r * Math.sin(angles[i]));
+        return `${x},${y}`;
+      }).join(" ");
+
+      document.getElementById("radar-polygon").setAttribute("points", points);
+    }
+
+    // 重置
+    document.getElementById("btn-restart").addEventListener("click", () => {
+      playTapSound(400, 0.05);
+      currentQuestionIndex = 0;
+      scores = { O: 0, S: 0, G: 0, T: 0, M: 0, W: 0, A: 0, D: 0 };
+      tagCounts = {};
+      screenResult.classList.add("hidden");
+      screenIntro.classList.remove("hidden");
+      screenIntro.classList.add("flex");
+      topIndicator.innerText = "READY";
+    });
+
+    // html2canvas 生成高清卡片
+    document.getElementById("btn-save-img").addEventListener("click", () => {
+      playTapSound(700, 0.08);
+      const card = document.getElementById("capture-card");
+      const btn = document.getElementById("btn-save-img");
+      const originalText = btn.innerText;
+      btn.innerText = "正在渲染高清图片...";
+
+      html2canvas(card, {
+        scale: 2,
+        backgroundColor: "#09090b",
+        useCORS: true
+      }).then(canvas => {
+        const imgData = canvas.toDataURL("image/png");
+        document.getElementById("generated-image").src = imgData;
+        document.getElementById("image-modal").classList.remove("hidden");
+        btn.innerText = originalText;
+      }).catch(err => {
+        alert("图片生成失败，可直接使用系统截图功能。");
+        btn.innerText = originalText;
+      });
+    });
+
+    document.getElementById("btn-close-modal").addEventListener("click", () => {
+      document.getElementById("image-modal").classList.add("hidden");
+    });
+  </script>
+</body>
+</html>
